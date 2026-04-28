@@ -1,51 +1,122 @@
-# @reaatech/mcp-changelog
+# mcp-changelog
 
 > Automated changelog and migration guide generator for MCP servers.
 
-[![npm version](https://img.shields.io/npm/v/@reaatech/mcp-changelog.svg)](https://www.npmjs.com/package/@reaatech/mcp-changelog)
+[![npm version](https://img.shields.io/npm/v/mcp-changelog.svg)](https://www.npmjs.com/package/mcp-changelog)
 [![CI](https://github.com/reaatech/mcp-changelog/actions/workflows/ci.yml/badge.svg)](https://github.com/reaatech/mcp-changelog/actions)
 
-**mcp-changelog** watches your MCP server's tool schemas across git commits/tags, detects additions, removals, breaking changes, and default value changes, and generates:
+**mcp-changelog** watches your MCP server's tool schemas across git tags and commits, detects changes (additions, removals, breaking changes, field renames, type changes, and more), and generates:
 
-- 📋 A **human-readable changelog** (Markdown)
-- 🧭 A **migration guide** for breaking changes with before/after examples
-- 🤖 A **machine-readable diff** (JSON) that tooling can consume
+- **Changelog** (Markdown) — Human-readable, keeps the [Keep a Changelog](https://keepachangelog.com/) style
+- **Migration guide** (Markdown) — Step-by-step instructions with before/after examples
+- **JSON diff** — Machine-readable output for downstream tooling
 
-Runs as a CLI (`mcp-changelog generate v1.2.0..v1.3.0`) and as a **GitHub Action** that comments on PRs with schema changes.
+Works as a CLI and as a **GitHub Action** that posts an auto-updating comment on PRs.
 
-Pairs with [**mcp-schema-evolution**](https://github.com/reaatech/mcp-schema-evolution) — that one *prevents* breaking changes, this one *documents* them. Together they're the "schema governance" story for MCP.
+Pairs with [**mcp-schema-evolution**](https://github.com/reaatech/mcp-schema-evolution) — that project *prevents* breaking changes; this one *documents* them.
 
 ---
 
 ## Installation
 
 ```bash
-# Global CLI
-npm install -g @reaatech/mcp-changelog
+npm install -g mcp-changelog
 
-# Or use via npx
-npx @reaatech/mcp-changelog generate v1.2.0..v1.3.0
+# Or run ad-hoc via npx
+npx mcp-changelog generate v1.2.0..v1.3.0
 ```
+
+**Requirements:** Node.js 20+, pnpm 9+ (for development).
+
+---
 
 ## Quick Start
 
 ```bash
-# Generate changelog between two git tags
-mcp-changelog generate v1.2.0..v1.3.0
+# Generate a full changelog between two git tags
+mcp-changelog generate v1.0.0..v2.0.0
 
-# Specify a custom schema path
-mcp-changelog generate v1.2.0..v1.3.0 --schema-path api/schema.json
+# Write output to a specific directory
+mcp-changelog generate v1.0.0..v2.0.0 --output-dir ./docs/changelog
 
-# Output JSON diff only
-mcp-changelog generate v1.2.0..v1.3.0 --format json
+# Generate JSON diff only
+mcp-changelog generate v1.0.0..v2.0.0 --format json
 
-# Inspect a schema at a specific ref
-mcp-changelog inspect schema.json --ref v1.3.0
+# Inspect a schema at a specific tag to verify its structure
+mcp-changelog inspect schema.json --ref v2.0.0
+
+# Show a diff summary in the terminal (no files written)
+mcp-changelog diff v1.0.0..v2.0.0
+
+# List all version tags
+mcp-changelog list-tags
 ```
+
+---
+
+## CLI Reference
+
+### `generate <range>`
+
+Run the full pipeline and write output files.
+
+```
+mcp-changelog generate v1.0.0..v2.0.0 [options]
+```
+
+| Option | Description | Default |
+|---|---|---|
+| `-s, --schema-path <path>` | Path to schema file (auto-detected if omitted) | — |
+| `-o, --output-dir <dir>` | Directory for output files | `./` |
+| `-f, --format <format>` | Output format: `markdown`, `json`, or `all` | `all` |
+| `-c, --config <path>` | Path to config file | — |
+| `-v, --verbose` | Enable verbose logging | `false` |
+
+Generates `CHANGELOG.md`, `MIGRATION.md`, and `diff.json` by default.
+
+### `diff <range>`
+
+Show a summary of changes without writing files.
+
+```
+mcp-changelog diff v1.0.0..v2.0.0 [options]
+```
+
+| Option | Description | Default |
+|---|---|---|
+| `-s, --schema-path <path>` | Path to schema file | — |
+| `-f, --format <format>` | Output format: `text` or `json` | `text` |
+| `-c, --config <path>` | Path to config file | — |
+
+### `inspect <schema>`
+
+Parse and display a schema file, optionally at a specific git ref.
+
+```
+mcp-changelog inspect schema.json [options]
+```
+
+| Option | Description | Default |
+|---|---|---|
+| `-r, --ref <ref>` | Git ref to read from | — |
+
+### `list-tags`
+
+List all git tags, optionally filtered by a regex pattern.
+
+```
+mcp-changelog list-tags [options]
+```
+
+| Option | Description | Default |
+|---|---|---|
+| `-p, --pattern <pattern>` | Regex pattern to filter tags | — |
+
+---
 
 ## GitHub Action
 
-Add to `.github/workflows/schema-changelog.yml`:
+Add a workflow at `.github/workflows/schema-changelog.yml`:
 
 ```yaml
 name: Schema Changelog
@@ -69,47 +140,142 @@ jobs:
       - uses: reaatech/mcp-changelog@v1
         with:
           comment-on-pr: true
+          fail-on-breaking: false
 ```
 
-The action will post a comment on your PR summarizing schema changes and suggesting a version bump.
+### Action Inputs
+
+| Input | Description | Default |
+|---|---|---|
+| `schema-path` | Path to schema file (auto-detected if omitted) | — |
+| `base-ref` | Base git ref for comparison | Auto |
+| `head-ref` | Head git ref for comparison | Auto |
+| `comment-on-pr` | Post or update a comment on the PR | `true` |
+| `fail-on-breaking` | Fail the workflow if breaking changes are detected | `false` |
+| `output-dir` | Directory for output files | — |
+| `format` | Output format: `markdown`, `json`, or `all` | `all` |
+| `config` | Path to config file | — |
+| `github-token` | Token for posting PR comments | `${{ github.token }}` |
+
+### Action Outputs
+
+| Output | Description |
+|---|---|
+| `has-breaking` | Whether breaking changes were detected (`true` / `false`) |
+| `suggested-bump` | Suggested version bump (`major`, `minor`, `patch`) |
+
+The PR comment is updated on each push (no duplicate comments). It includes a summary table of changes and a suggested version bump.
+
+---
 
 ## Configuration
 
-Create `mcp-changelog.config.js` (or `.mjs` / `.cjs` / `.json`) in your repo root. A `mcp-changelog` key in `package.json` is also picked up automatically.
+Create `mcp-changelog.config.{js,mjs,cjs,json}` in your repo root, or add a `"mcp-changelog"` key in `package.json`. Configuration is discovered automatically; explicit path via `--config` / the `config` action input overrides it.
 
 ```js
+// mcp-changelog.config.js
 export default {
   schema: {
-    paths: ['schema.json'], // Auto-detected if omitted
+    paths: ['schema.json'],          // Auto-detected if omitted
+    exclude: ['node_modules/**',
+              'dist/**',
+              '.git/**',
+              'coverage/**'],
   },
+
   output: {
     dir: './changelog',
     formats: ['markdown', 'json'],
+    changelogFile: 'CHANGELOG.md',
+    migrationFile: 'MIGRATION.md',
+    diffFile: 'diff.json',
   },
+
   changelog: {
     template: 'default',
     includeMigrationLinks: true,
+    emojiStyle: 'github',           // 'github' | 'none'
+  },
+
+  migration: {
+    includeCodeExamples: true,
+    languages: ['json'],
+  },
+
+  git: {
+    tagPattern: '^v\\d+\\.\\d+\\.\\d+$',
+  },
+
+  ci: {
+    commentOnPR: true,
+    failOnBreaking: false,
   },
 };
 ```
 
+All keys are optional. Omitted values fall back to the defaults shown above. CLI flags and action inputs take precedence over config values.
+
+### Config File Discovery Order
+
+1. Explicit path (`--config` / `config` input)
+2. `mcp-changelog.config.{js,mjs,cjs,json}` in repo root
+3. `"mcp-changelog"` key in `package.json`
+
+---
+
 ## How It Works
 
-1. **Git Integration** — Resolves git refs and extracts schema files at any commit/tag
-2. **Schema Discovery** — Auto-detects `schema.json`, `mcp.json`, `tools.json`, or custom patterns
-3. **Change Detection** — Uses [`@mcp-schema-evolution/core`](https://github.com/reaatech/mcp-schema-evolution) to diff `Tool[]` snapshots
-4. **Output Generation** — Produces Markdown changelog, migration guide, and JSON diff in parallel
+```
+ User runs:  mcp-changelog generate v1.0.0..v2.0.0
+                                    │
+   ┌────────────────────────────────┼──────────────────────────────┐
+   │  Git Integration               │                              │
+   │  • resolveRef() resolves each tag to a commit SHA              │
+   │  • parseRange() splits & resolves both ends in parallel       │
+   └────────────────────────────────┼──────────────────────────────┘
+                                    │
+   ┌────────────────────────────────┼──────────────────────────────┐
+   │  Schema Discovery              │                              │
+   │  • locateSchemas() finds schema files via glob patterns        │
+   │  • parseSchema() parses JSON and validates with Zod            │
+   │  • Both refs are discovered in parallel                       │
+   └────────────────────────────────┼──────────────────────────────┘
+                                    │
+   ┌────────────────────────────────┼──────────────────────────────┐
+   │  Change Detection              │                              │
+   │  • detectChanges() wraps @mcp-schema-evolution/core            │
+   │  • detectMultiSchema() handles repos with multiple schemas     │
+   │  • Detects: tool_added, field_renamed, type_changed, etc.     │
+   └────────────────────────────────┼──────────────────────────────┘
+                                    │
+   ┌────────────────────────────────┼──────────────────────────────┐
+   │  Output Generation (parallel)  │                              │
+   │  • generateChangelog() → CHANGELOG.md                         │
+   │  • generateMigrationGuide() → MIGRATION.md                    │
+   │  • generateJsonDiff() → diff.json                             │
+   └────────────────────────────────┴──────────────────────────────┘
+```
+
+**Change categories detected:** `tool_added`, `tool_removed`, `field_added`, `field_removed`, `field_renamed`, `type_changed`, `required_changed`, `default_changed`, `constraint_changed`, and `deprecated`.
+
+---
 
 ## Documentation
 
-- [ARCHITECTURE.md](./ARCHITECTURE.md) — System design and module specs
-- [DEV_PLAN.md](./DEV_PLAN.md) — Development roadmap
-- [CONTRIBUTING.md](./CONTRIBUTING.md) — Contribution guidelines
-- [AGENTS.md](./AGENTS.md) — Guidelines for AI agents working on this codebase
+| Document | Description |
+|---|---|
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | System design, module specs, data flow |
+| [DEV_PLAN.md](./DEV_PLAN.md) | Development roadmap and milestones |
+| [CONTRIBUTING.md](./CONTRIBUTING.md) | Contribution guidelines and coding standards |
+| [AGENTS.md](./AGENTS.md) | Guidelines for AI agents working on this codebase |
+
+---
 
 ## Related Projects
 
-- [**mcp-schema-evolution**](https://github.com/reaatech/mcp-schema-evolution) — Prevent breaking changes, generate backward-compatible wrappers
+- [**mcp-schema-evolution**](https://github.com/reaatech/mcp-schema-evolution) — Prevent breaking changes, generate backward-compatible wrappers, and validate schemas in CI.
+
+---
 
 ## License
 
