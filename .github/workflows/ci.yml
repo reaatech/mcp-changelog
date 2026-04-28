@@ -30,7 +30,9 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Build mcp-schema-evolution/core
-        run: pnpm --filter @mcp-schema-evolution/core run build
+        run: |
+          ln -s "$(pwd)/node_modules" ../mcp-schema-evolution/node_modules
+          pnpm --filter @mcp-schema-evolution/core run build
 
       - name: Lint
         run: pnpm run lint
