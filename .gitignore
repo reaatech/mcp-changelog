@@ -1,0 +1,12 @@
+node_modules/
+dist/
+bin/
+coverage/
+*.log
+.DS_Store
+.env
+*.tgz
+src/cli/version.ts
+.claude
+.idea
+DEV_PLAN.md
