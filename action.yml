@@ -1,0 +1,50 @@
+name: 'MCP Changelog'
+description: 'Generate changelogs and migration guides for MCP schema changes'
+author: 'reaatech'
+
+inputs:
+  schema-path:
+    description: 'Path to schema file (auto-detected if omitted)'
+    required: false
+  base-ref:
+    description: 'Base git ref for comparison'
+    required: false
+  head-ref:
+    description: 'Head git ref for comparison'
+    required: false
+  comment-on-pr:
+    description: 'Post comment on PR'
+    required: false
+    default: 'true'
+  fail-on-breaking:
+    description: 'Fail workflow on breaking changes'
+    required: false
+    default: 'false'
+  output-dir:
+    description: 'Directory for output files'
+    required: false
+  format:
+    description: 'Output format (markdown, json, all)'
+    required: false
+    default: 'all'
+  config:
+    description: 'Path to config file'
+    required: false
+  github-token:
+    description: 'GitHub token for posting PR comments'
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  has-breaking:
+    description: 'Whether breaking changes were detected'
+  suggested-bump:
+    description: 'Suggested version bump (major, minor, patch)'
+
+runs:
+  using: 'node20'
+  main: 'action/dist/index.js'
+
+branding:
+  icon: 'file-text'
+  color: 'blue'
