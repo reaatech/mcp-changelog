@@ -1,0 +1,6 @@
+# When developing locally with a sibling mcp-schema-evolution clone.
+# Before publishing, ensure @mcp-schema-evolution/core is published to npm first,
+# then switch the devDependency in package.json from "workspace:*" to "^0.1.0".
+packages:
+  - '.'
+  - '../mcp-schema-evolution/packages/core'

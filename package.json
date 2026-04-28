@@ -1,0 +1,80 @@
+{
+  "name": "mcp-changelog",
+  "version": "0.1.0",
+  "description": "Automated changelog and migration guide generator for MCP servers",
+  "type": "module",
+  "files": [
+    "bin",
+    "action/dist",
+    "action.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "bin": {
+    "mcp-changelog": "./bin/cli.js"
+  },
+  "scripts": {
+    "clean": "node -e \"const fs=require('fs');for(const d of ['dist','action/dist','bin'])fs.rmSync(d,{recursive:true,force:true})\"",
+    "syncversion": "node scripts/sync-version.mjs",
+    "build": "pnpm clean && pnpm syncversion && tsc",
+    "build:cli": "pnpm syncversion && node -e \"require('fs').rmSync('bin',{recursive:true,force:true})\" && ncc build src/cli/index.ts -o bin --license licenses.txt && node scripts/finalize-bundle.mjs bin --rename index.js=cli.js --shebang cli.js",
+    "build:action": "pnpm syncversion && node -e \"require('fs').rmSync('action/dist',{recursive:true,force:true})\" && ncc build src/action/index.ts -o action/dist --license licenses.txt && node scripts/finalize-bundle.mjs action/dist",
+    "pretest": "pnpm syncversion && tsc",
+    "test": "vitest run",
+    "pretest:coverage": "pnpm syncversion && tsc",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "typecheck": "pnpm syncversion && tsc --noEmit",
+    "check": "pnpm lint && pnpm typecheck && pnpm test",
+    "prepublishOnly": "pnpm run check && pnpm run build:cli && pnpm run build:action"
+  },
+  "keywords": [
+    "mcp",
+    "changelog",
+    "schema",
+    "migration",
+    "model-context-protocol"
+  ],
+  "author": "Rick Somers <rick@reaatech.com> (https://reaatech.com)",
+  "license": "MIT",
+  "homepage": "https://github.com/reaatech/mcp-changelog#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reaatech/mcp-changelog.git"
+  },
+  "bugs": {
+    "url": "https://github.com/reaatech/mcp-changelog/issues"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@actions/core": "^3.0.1",
+    "@actions/github": "^9.1.1",
+    "@eslint/js": "^9.0.0",
+    "@mcp-schema-evolution/core": "workspace:*",
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.0",
+    "@typescript-eslint/parser": "^8.59.0",
+    "@vercel/ncc": "^0.38.4",
+    "@vitest/coverage-v8": "^1.3.0",
+    "commander": "^12.0.0",
+    "eslint": "^9.0.0",
+    "execa": "^9.6.1",
+    "globals": "^17.5.0",
+    "minimatch": "^10.2.5",
+    "octokit": "^4.0.0",
+    "prettier": "^3.0.0",
+    "simple-git": "^3.22.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.3.0",
+    "zod": "^3.22.4"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "publishConfig": {
+    "access": "public"
+  }
+}
