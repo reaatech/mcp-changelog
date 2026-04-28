@@ -13,10 +13,11 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Checkout mcp-schema-evolution
-        uses: actions/checkout@v4
-        with:
-          repository: reaatech/mcp-schema-evolution
-          path: ../mcp-schema-evolution
+        run: |
+          git clone \
+            --depth 1 \
+            https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/reaatech/mcp-schema-evolution.git \
+            ../mcp-schema-evolution
 
       - uses: pnpm/action-setup@v4
         with:
