@@ -1,5 +1,5 @@
 import type { DiffResult, DiffSummary } from '../types/index.js';
-import type { SchemaChange } from '@mcp-schema-evolution/core';
+import type { SchemaChange } from '@reaatech/mcp-schema-evolution';
 
 export interface JsonDiffOutput {
   version: string;

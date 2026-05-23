@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { generateChangelog } from './generate.js';
-import type { SchemaChange } from '@mcp-schema-evolution/core';
+import type { SchemaChange } from '@reaatech/mcp-schema-evolution';
 
 function makeChange(type: SchemaChange['type'], category: SchemaChange['category']): SchemaChange {
   return {
