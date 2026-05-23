@@ -1,4 +1,4 @@
-import type { SchemaChange } from '@mcp-schema-evolution/core';
+import type { SchemaChange } from '@reaatech/mcp-schema-evolution';
 
 export interface Section {
   emoji: string;

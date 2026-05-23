@@ -1,11 +1,11 @@
 /**
  * Core types for mcp-changelog.
  *
- * These extend the shared types from @mcp-schema-evolution/core with
+ * These extend the shared types from @reaatech/mcp-schema-evolution with
  * changelog-specific types for git refs, output generation, and configuration.
  */
 
-import type { SchemaChange, Tool } from '@mcp-schema-evolution/core';
+import type { SchemaChange, Tool } from '@reaatech/mcp-schema-evolution';
 
 /** A resolved git reference. */
 export interface GitRef {
@@ -63,4 +63,4 @@ export interface DiffSummary {
 }
 
 /** Re-export shared types for convenience. */
-export type { SchemaChange, Tool, ToolSnapshot } from '@mcp-schema-evolution/core';
+export type { SchemaChange, Tool, ToolSnapshot } from '@reaatech/mcp-schema-evolution';

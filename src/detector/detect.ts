@@ -1,11 +1,11 @@
-import { diffToolSnapshots } from '@mcp-schema-evolution/core';
-import type { SchemaChange, Tool } from '@mcp-schema-evolution/core';
+import { diffToolSnapshots } from '@reaatech/mcp-schema-evolution';
+import type { SchemaChange, Tool } from '@reaatech/mcp-schema-evolution';
 import type { DiscoveredSchema } from '../discovery/types.js';
 
 /**
  * Detect changes between two tool snapshots.
  *
- * Thin wrapper around `@mcp-schema-evolution/core`'s `diffToolSnapshots`.
+ * Thin wrapper around `@reaatech/mcp-schema-evolution`'s `diffToolSnapshots`.
  * Always check `Result.ok` and throws descriptive errors on failure.
  */
 export function detectChanges(oldTools: Tool[], newTools: Tool[]): SchemaChange[] {

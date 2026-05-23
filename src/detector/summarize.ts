@@ -1,4 +1,4 @@
-import type { SchemaChange } from '@mcp-schema-evolution/core';
+import type { SchemaChange } from '@reaatech/mcp-schema-evolution';
 import type { DiffSummary } from '../types/index.js';
 
 /**
