@@ -283,7 +283,7 @@ coverage/
 Since `mcp-schema-evolution` is a local sibling project (`../mcp-schema-evolution`), use pnpm workspace or `link:` protocol during active development:
 ```json
 "dependencies": {
-  "@mcp-schema-evolution/core": "workspace:*"
+  "@reaatech/mcp-schema-evolution": "workspace:*"
 }
 ```
 

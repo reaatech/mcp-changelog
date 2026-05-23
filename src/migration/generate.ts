@@ -1,4 +1,4 @@
-import type { SchemaChange } from '@mcp-schema-evolution/core';
+import type { SchemaChange } from '@reaatech/mcp-schema-evolution';
 
 /**
  * Generate a migration guide Markdown document for breaking changes.

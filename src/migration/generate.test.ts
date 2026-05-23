@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { generateMigrationGuide } from './generate.js';
-import type { SchemaChange } from '@mcp-schema-evolution/core';
+import type { SchemaChange } from '@reaatech/mcp-schema-evolution';
 
 function makeBreakingChange(category: SchemaChange['category'], description: string): SchemaChange {
   return {
