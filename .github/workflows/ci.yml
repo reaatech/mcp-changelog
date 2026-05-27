@@ -31,8 +31,8 @@ jobs:
 
       - name: Build mcp-schema-evolution/core
         run: |
-          ln -s "$(pwd)/node_modules" ../mcp-schema-evolution/node_modules
-          pnpm --filter @reaatech/mcp-schema-evolution run build
+          ln -s "${{ github.workspace }}/node_modules" ../mcp-schema-evolution/packages/core/node_modules
+          cd ../mcp-schema-evolution/packages/core && node_modules/.bin/tsc
 
       - name: Lint
         run: pnpm run lint

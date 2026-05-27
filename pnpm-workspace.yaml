@@ -1,6 +1,6 @@
-# When developing locally with a sibling mcp-schema-evolution clone.
+# When developing locally with a sibling mcp-schema-evolution clone,
+# use "link:../mcp-schema-evolution/packages/core" in devDependencies.
 # Before publishing, ensure @reaatech/mcp-schema-evolution is published to npm first,
-# then switch the devDependency in package.json from "workspace:*" to "^0.1.0".
+# then switch the devDependency in package.json from "link:..." to "^0.1.0".
 packages:
   - '.'
-  - '../mcp-schema-evolution/packages/core'
