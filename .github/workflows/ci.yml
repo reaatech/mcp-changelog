@@ -32,7 +32,7 @@ jobs:
       - name: Build mcp-schema-evolution/core
         run: |
           ln -s "$(pwd)/node_modules" ../mcp-schema-evolution/node_modules
-          pnpm --filter @reaatech/mcp-schema-evolution run build
+          cd ../mcp-schema-evolution/packages/core && pnpm run build
 
       - name: Lint
         run: pnpm run lint
